@@ -2326,22 +2326,22 @@ static inline bool rect_is_fullscreen(const session_t *ps, int x, int y, int wid
 }
 
 /**
- * Check if a window is fulscreen using EWMH
+ * Check if a window has WM_STATE
  *
  * TODO(yshui) cache this property
  */
 static inline bool
-win_is_fullscreen_xcb(xcb_connection_t *c, const struct atom *a, const xcb_window_t w) {
+win_has_wm_state(const session_t *s, const xcb_window_t w, xcb_atom_t state) {
 	xcb_get_property_cookie_t prop =
-	    xcb_get_property(c, 0, w, a->a_NET_WM_STATE, XCB_ATOM_ATOM, 0, 12);
-	xcb_get_property_reply_t *reply = xcb_get_property_reply(c, prop, NULL);
+	    xcb_get_property(s->c, 0, w, s->atoms->a_NET_WM_STATE, XCB_ATOM_ATOM, 0, 12);
+	xcb_get_property_reply_t *reply = xcb_get_property_reply(s->c, prop, NULL);
 	if (!reply)
 		return false;
 
 	if (reply->length) {
 		xcb_atom_t *val = xcb_get_property_value(reply);
 		for (uint32_t i = 0; i < reply->length; i++) {
-			if (val[i] != a->a_NET_WM_STATE_FULLSCREEN)
+			if (val[i] != state)
 				continue;
 			free(reply);
 			return true;
@@ -2388,10 +2388,19 @@ bool win_check_flags_all(struct managed_win *w, uint64_t flags) {
  * It's not using w->border_size for performance measures.
  */
 bool win_is_fullscreen(const session_t *ps, const struct managed_win *w) {
-	if (!ps->o.no_ewmh_fullscreen && win_is_fullscreen_xcb(ps->c, ps->atoms, w->client_win))
+	if (!ps->o.no_ewmh_fullscreen &&
+	    win_has_wm_state(ps, w->client_win, ps->atoms->a_NET_WM_STATE_FULLSCREEN))
 		return true;
 	return rect_is_fullscreen(ps, w->g.x, w->g.y, w->widthb, w->heightb) &&
 	       (!w->bounding_shaped || w->rounded_corners);
+}
+
+bool win_is_hidden(const session_t *ps, const struct managed_win *w) {
+	return win_has_wm_state(ps, w->client_win, ps->atoms->a_NET_WM_STATE_HIDDEN);
+}
+
+bool win_is_sticky(const session_t *ps, const struct managed_win *w) {
+	return win_has_wm_state(ps, w->client_win, ps->atoms->a_NET_WM_STATE_STICKY);
 }
 
 /**

@@ -36,9 +36,13 @@
 	_NET_WM_WINDOW_TYPE_NOTIFICATION, \
 	_NET_WM_WINDOW_TYPE_COMBO, \
 	_NET_WM_WINDOW_TYPE_DND, \
+	_NET_WM_BYPASS_COMPOSITOR
+
+#define ATOM_LIST2 \
 	_NET_WM_STATE, \
 	_NET_WM_STATE_FULLSCREEN, \
-	_NET_WM_BYPASS_COMPOSITOR
+	_NET_WM_STATE_HIDDEN, \
+	_NET_WM_STATE_STICKY
 // clang-format on
 
 #define ATOM_DEF(x) xcb_atom_t a##x
@@ -46,6 +50,7 @@
 struct atom {
 	struct cache *c;
 	LIST_APPLY(ATOM_DEF, SEP_COLON, ATOM_LIST);
+	LIST_APPLY(ATOM_DEF, SEP_COLON, ATOM_LIST2);
 };
 
 struct atom *init_atoms(xcb_connection_t *);

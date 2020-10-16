@@ -418,6 +418,16 @@ struct managed_win *find_managed_window_or_parent(session_t *ps, xcb_window_t wi
 bool attr_pure win_is_fullscreen(const session_t *ps, const struct managed_win *w);
 
 /**
+ * Check if a window is a hidden window.
+ */
+bool attr_pure win_is_hidden(const session_t *ps, const struct managed_win *w);
+
+/**
+ * Check if a window is a sticky window.
+ */
+bool attr_pure win_is_sticky(const session_t *ps, const struct managed_win *w);
+
+/**
  * Check if a window is focused, without using any focus rules or forced focus settings
  */
 bool attr_pure win_is_focused_raw(const session_t *ps, const struct managed_win *w);

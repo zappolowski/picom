@@ -132,6 +132,8 @@ struct _c2_l {
 	       C2_L_PCLASSG,
 	       C2_L_PCLASSI,
 	       C2_L_PROLE,
+	       C2_L_PHIDDEN,
+	       C2_L_PSTICKY,
 	} predef;
 	enum c2_l_type {
 		C2_L_TUNDEFINED,
@@ -209,6 +211,8 @@ static const c2_predef_t C2_PREDEFS[] = {
     [C2_L_PCLASSG] = {"class_g", C2_L_TSTRING, 0},
     [C2_L_PCLASSI] = {"class_i", C2_L_TSTRING, 0},
     [C2_L_PROLE] = {"role", C2_L_TSTRING, 0},
+    [C2_L_PHIDDEN] = {"hidden", C2_L_TCARDINAL, 0},
+    [C2_L_PSTICKY] = {"sticky", C2_L_TCARDINAL, 0},
 };
 
 /**
@@ -1325,6 +1329,8 @@ static inline void c2_match_once_leaf(session_t *ps, const struct managed_win *w
 			case C2_L_PROUNDED: tgt = w->rounded_corners; break;
 			case C2_L_PCLIENT: tgt = w->client_win; break;
 			case C2_L_PLEADER: tgt = w->leader; break;
+			case C2_L_PHIDDEN: tgt = win_is_hidden(ps, w); break;
+			case C2_L_PSTICKY: tgt = win_is_sticky(ps, w); break;
 			default:
 				*perr = true;
 				assert(0);
